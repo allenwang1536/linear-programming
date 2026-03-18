@@ -1,0 +1,11 @@
+{"Instance": "C10_40_100.scm", "Time": 0.02, "Result": 14536, "Solution": "OPT"}
+{"Instance": "C10_50_300.scm", "Time": 0.02, "Result": 16439, "Solution": "OPT"}
+{"Instance": "C18_100_150.scm", "Time": 0.03, "Result": 10482, "Solution": "OPT"}
+{"Instance": "C18_40_80.scm", "Time": 0.03, "Result": 10828, "Solution": "OPT"}
+{"Instance": "C1_40_150.scm", "Time": 0.01, "Result": 2474, "Solution": "OPT"}
+{"Instance": "C1_50_100.scm", "Time": 0.01, "Result": 1890, "Solution": "OPT"}
+{"Instance": "R18_100_100.scm", "Time": 0.03, "Result": 10471, "Solution": "OPT"}
+{"Instance": "R18_50_300.scm", "Time": 0.03, "Result": 14149, "Solution": "OPT"}
+{"Instance": "R1_100_50.scm", "Time": 0.01, "Result": 1515, "Solution": "OPT"}
+{"Instance": "R1_40_100.scm", "Time": 0.01, "Result": 2574, "Solution": "OPT"}
+{"Instance": "R1_40_50.scm", "Time": 0.01, "Result": 1960, "Solution": "OPT"}
