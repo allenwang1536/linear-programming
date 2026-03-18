@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Optional
 
 import numpy as np
+import math
 from ortools.linear_solver.python import model_builder
 
 
@@ -32,16 +33,73 @@ class LPInstance:
         """
 
         # TODO: your model goes here
+        model = self.model
+        solver = self.solver
+
+        numCustomers = self.numCustomers
+        numFacilities = self.numFacilities
 
         # Variables
+        openOfFacility = [ model.new_num_var(0, 1.0, f"open:{f}") for f in range(numFacilities) ]
+        
+        numVehiclesOfFacility = [ model.new_num_var(0, self.numMaxVehiclePerFacility, f"vehicles:{f}") for f in range(numFacilities)]
+        
+        assignmentOfCustomerFacility = [
+                                        [ model.new_num_var(0, 1.0, f"assignment:{c}:{f}") for f in range(numFacilities)]
+                                        for c in range(numCustomers)
+                                        ]
 
         # Constraints
+        # customer fulfilled requirement
+        for c in range(numCustomers):
+            model.add(
+                sum(assignmentOfCustomerFacility[c][f] for f in range(numFacilities)) == 1.0
+            )
 
-        # Solve
-        self.solution = ...
-        self.objective_value = ...
+        # facility capacity limit
+        for f in range(numFacilities):
+            totalDemand = sum(assignmentOfCustomerFacility[c][f] * self.demandC[c] for c in range(numCustomers))
+            model.add(
+                totalDemand <= self.capacityF[f] * openOfFacility[f]
+            )
 
-        pass
+        # vehicle limit
+        for f in range(numFacilities):
+            model.add(
+                numVehiclesOfFacility[f] <= self.numMaxVehiclePerFacility * openOfFacility[f]
+            )
+
+        # driving limit
+        for f in range(numFacilities):
+            totalDist = sum(self.distanceCF[c][f] * assignmentOfCustomerFacility[c][f] for c in range(numCustomers))
+            model.add(
+                totalDist <= numVehiclesOfFacility[f] * self.truckDistLimit
+            )
+        
+        # optional: customer can only be assigned to an open facility
+
+        # Cost Function
+        model.minimize(
+            # opening cost
+            sum(openOfFacility[f] * self.openingCostF[f] for f in range(numFacilities))
+
+            # customer demand fulfillment cost 
+            + sum(
+                assignmentOfCustomerFacility[c][f] * self.allocCostCF[c][f]
+                for c in range(numCustomers)
+                for f in range(numFacilities)
+            )
+            
+            # vehicle cost
+            + sum(numVehiclesOfFacility[f] * self.truckUsageCost for f in range(numFacilities))
+        )
+
+        # Solve 
+        self.solution = solver.solve(model)
+        if self.solution == model_builder.SolveStatus.OPTIMAL:
+            self.objective_value = math.ceil(solver.objective_value)
+        else:
+            self.objective_value = None
 
     def load_from_file(self, filename: str):
         try:
